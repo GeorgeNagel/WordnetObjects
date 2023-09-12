@@ -12,9 +12,32 @@ synsets = [
     wn.synset("substance.n.07"),
 ]
 
+exclusion_synsets = [wn.synset("inhabitant.n.01")]
+
+
+def clean_hyponyms(hyponyms):
+    cleaned = []
+    for hyponym in hyponyms:
+        hypernyms = hyponym.hypernyms()
+        if hyponym in exclusion_synsets:
+            continue
+
+        banned_synset = False
+        for hypernym in hypernyms:
+            if hypernym in exclusion_synsets:
+                banned_synset = True
+                break
+        if banned_synset:
+            continue
+
+        cleaned.append(hyponym)
+    return cleaned
+
+
 for synset in synsets:
     hyponyms = synset.hyponyms()
-    synsets.extend(hyponyms)
+    cleaned_hyponyms = clean_hyponyms(hyponyms)
+    synsets.extend(cleaned_hyponyms)
     if not hyponyms:
         leaf_synsets.append(synset)
 
