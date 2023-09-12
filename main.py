@@ -5,17 +5,20 @@ from nltk.corpus import wordnet as wn
 
 output_filename = "raw_objects.txt"
 
-leaf_synsets = []
+# List of starting points whose hyponyms we want to include
 synsets = [
     wn.synset("physical_entity.n.01"),
     wn.synset("instrumentality.n.03"),
     wn.synset("substance.n.07"),
 ]
-
+# List of synsets whose hyponyms we don't want to include in our output
 exclusion_synsets = [wn.synset("inhabitant.n.01")]
 
 
 def clean_hyponyms(hyponyms):
+    """
+    Returns a list of hyponyms that are not excluded and whose hypernyms are not excluded
+    """
     cleaned = []
     for hyponym in hyponyms:
         hypernyms = hyponym.hypernyms()
@@ -34,6 +37,8 @@ def clean_hyponyms(hyponyms):
     return cleaned
 
 
+# Create a list of synsets which have no hyponyms
+leaf_synsets = []
 for synset in synsets:
     hyponyms = synset.hyponyms()
     cleaned_hyponyms = clean_hyponyms(hyponyms)
@@ -48,11 +53,11 @@ for synset in leaf_synsets:
     cleaned_lemma = lemma.replace("_", " ")
     lemmas.add(cleaned_lemma)
 
+
+# Write the lemmas to our output file
 # Add newlines after every lemma
 lines = []
 for lemma in sorted(lemmas):
     lines.append(f"{lemma}\n")
-
-# Write the lemmas to our output file
 with open(output_filename, "w") as fout:
     fout.writelines(lines)
